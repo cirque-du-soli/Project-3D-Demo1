@@ -49,9 +49,6 @@ http {
             try_files $uri $uri/ /index.html;
         }
 
-	    location / {
-	        proxy_pass https://www.google.com/;
-	    }
     }
 } 
 
