@@ -5,9 +5,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 //import { FlyControls } from 'three/addons/controls/FlyControls.js';
-import { FlyControls } from '/FlyControlsCUSTOM.js';
+import { FlyControls } from '/scripts/FlyControlsCUSTOM.js';
 import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
-import Stats from 'three/addons/libs/stats.module.js';
+import { Stats } from '/scripts/StatsCUSTOM.js';
 
 
 
@@ -59,8 +59,8 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         scene = new THREE.Scene();
 
         // Add camera, set its position and orientation
-        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
-        camera.position.set(0, 0, 35);
+        camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 500);
+        camera.position.set(55, 0, -35);
         camera.lookAt(0, 0, 0);
 
         // Add Renderer
@@ -86,6 +86,8 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
 
         // Event Listeners
         window.addEventListener('resize', onWindowResize);
+        document.body.addEventListener('mouseleave', onMouseLeave);
+        document.body.addEventListener('mouseenter', onMouseEnter);
     }
 
 
@@ -93,12 +95,13 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     // Control Functions 
 
     function customizeFlyControls() {
-        flyControls.movementSpeed = 40;
+        flyControls.movementSpeed = 50;
         flyControls.domElement = container;
-        flyControls.rollSpeed = Math.PI / 8;
+        flyControls.rollSpeed = Math.PI / 6;
         flyControls.autoForward = false;
-        flyControls.dragToLook = true;
+        flyControls.dragToLook = false;
         flyControls.enableDamping = true;
+        flyControls.disableClickToMove = true;
     }
 
     function customizeOrbitControls() {
@@ -185,6 +188,16 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         renderer.setSize(window.innerWidth, window.innerHeight);
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
+    }
+
+    function onMouseLeave() {
+        flyControls.freeze = true;
+        //console.log('freeze');
+    }
+    
+    function onMouseEnter() {
+        flyControls.freeze = false;
+        //console.log('unfreeze');
     }
 
 } //END: WebGL Check

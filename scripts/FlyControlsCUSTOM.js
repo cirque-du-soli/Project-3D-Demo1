@@ -56,6 +56,12 @@ class FlyControls extends EventDispatcher {
         // soli's attempt at adding deadzone to center
         this.deadzonePercent = 0.2; // 20% deadzone
 
+        // soli's attempt at adding a freeze feature
+        this.freeze = false;
+
+        // soli's attempt at adding a disable click to move feature
+        this.disableClickToMove = false;
+
         this.keydown = function (event) {
 
             if (event.altKey || this.enabled === false) {
@@ -136,6 +142,10 @@ class FlyControls extends EventDispatcher {
 
                 this.status++;
 
+            } else if (this.disableClickToMove) {
+                    
+                    return;
+                
             } else {
 
                 switch (event.button) {
@@ -255,10 +265,13 @@ class FlyControls extends EventDispatcher {
 
             if (this.enabled === false) return;
 
+            if (this.freeze) {
+                this.moveVector.x = this.moveVector.y = this.moveVector.z = 0; // stop moving, but gently :)  
+                this.rotationVector.x = this.rotationVector.y = this.rotationVector.z = 0; // stop rotating, but gently :)
+            }
+
             const moveMult = delta * scope.movementSpeed;
             const rotMult = delta * scope.rollSpeed;
-
-
 
             if (scope.enableDamping) {
                 this.updateMovementVectorLerp();
