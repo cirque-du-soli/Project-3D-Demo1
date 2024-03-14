@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "heroku": "^8.10.0",
+    "heroku-cli": "^7.0.9",
     "three": "^0.162.0"
   },
   "devDependencies": {
@@ -10,6 +12,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "serve dist -s"
-},
+  },
   "type": "module"
 }
