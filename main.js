@@ -10,13 +10,13 @@ import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
 import Stats from 'three/addons/libs/stats.module.js';
 
 
- 
+
 // First, check for WebGL support, then create the scene
 if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     document.getElementById('container').appendChild(WebGL.getWebGLErrorMessage());
 } else {
 
-    
+
     // TEMP
     /* const 3dItemLoader = new GLTFLoader();
     */
@@ -27,9 +27,9 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     // DOM
     let container, stats;
     // Stage
-    let scene, camera, renderer; 
+    let scene, camera, renderer;
     // Lighting
-    let ambientLight, spotLight, lensflareLight1, lensflareLight2; 
+    let ambientLight, spotLight, lensflareLight1, lensflareLight2;
     // Loaders
     let miscLoader, bgLoader;
     // Controls
@@ -45,8 +45,8 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
 
     buildBackground();
 
-    animate(); 
-    
+    animate();
+
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     function initialSetup() {
@@ -97,16 +97,16 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         flyControls.domElement = container;
         flyControls.rollSpeed = Math.PI / 8;
         flyControls.autoForward = false;
-        flyControls.dragToLook = true;     
+        flyControls.dragToLook = true;
         flyControls.enableDamping = true;
-    } 
+    }
 
     function customizeOrbitControls() {
-        orbitControls.enableDamping = true; 
+        orbitControls.enableDamping = true;
         orbitControls.dampingFactor = 0.1;
         orbitControls.enableZoom = false;
         orbitControls.enabled = false;
-    }  
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Painting Functions
- 
+
     function animate() {
         requestAnimationFrame(animate);
 
