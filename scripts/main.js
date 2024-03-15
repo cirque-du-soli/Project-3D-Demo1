@@ -46,6 +46,8 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
 
     buildGeometries();
 
+    buildSpeckField();
+
     buildBackground();
 
     animate();
@@ -112,6 +114,25 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
             (Math.random() * (max4 - min4) + min4)
         ]
     }
+    function tetrahedronCoords() {
+
+        let m = 2000; // scale multiplier
+
+        let x1 = m * 1;
+        let y1 = m * -1 / Math.sqrt(3);
+        let z1 = m * -1 / Math.sqrt(6);
+        let x2 = m * -1;
+        let y2 = m * -1 / Math.sqrt(3);
+        let z2 = m * -1 / Math.sqrt(6);
+        let x3 = m * 0;
+        let y3 = m * 2 / Math.sqrt(3);
+        let z3 = m * -1 / Math.sqrt(6);
+        let x4 = m * 0;
+        let y4 = m * 0;
+        let z4 = m * 3 / Math.sqrt(6);
+
+        return [x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4];
+    }
 
     function addLight(h, s, l, x, y, z) {
 
@@ -129,8 +150,8 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         lensflare.addElement(new LensflareElement(textureFlare3, 100, randomFlares[2]));
         lensflare.addElement(new LensflareElement(textureFlare3, 50, randomFlares[3]));
         light.add(lensflare);
-
     }
+
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Control Functions 
 
@@ -141,6 +162,7 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         flyControls.autoForward = false;
         flyControls.dragToLook = false;
         flyControls.enableDamping = true;
+        flyControls.dampingFactor = 0.125;
         flyControls.disableClickToMove = true;
     }
 
@@ -165,38 +187,6 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1; // adjust this!! FIXME
         renderer.outputEncoding = THREE.sRGBEncoding;
-
-    }
-
-    function tetrahedronCoords() {
-
-        let m = 2000; // scale multiplier
-
-        let x1 = m * 1;
-        let y1 = m * -1 / Math.sqrt(3);
-        let z1 = m * -1 / Math.sqrt(6);
-        let x2 = m * -1;
-        let y2 = m * -1 / Math.sqrt(3);
-        let z2 = m * -1 / Math.sqrt(6);
-        let x3 = m * 0;
-        let y3 = m * 2 / Math.sqrt(3);
-        let z3 = m * -1 / Math.sqrt(6);
-        let x4 = m * 0;
-        let y4 = m * 0;
-        let z4 = m * 3 / Math.sqrt(6);
-
-        return [x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4];
-    }
-
-    function randCoord(min, max) {
-        // random number gen
-        let r1 = Math.random() * (max - min) + min;
-        let r2 = Math.random() * (max - min) + min;
-        let r3 = Math.random() * (max - min) + min;
-        let r4 = Math.random() * (max - min) + min;
-        let r5 = Math.random() * (max - min) + min;
-        let r6 = Math.random() * (max - min) + min;
-        return [r4, r4, r3, r2, r1, r2, r3, r5, r2, r1, r1, r6, r3, r1, r2];
     }
 
     function buildGeometries() {
@@ -243,6 +233,39 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     function transformCube() {
         cube.rotation.x += 0.01;
         cube.rotation.y += 0.01;
+    }
+
+    function buildSpeckField() {
+        
+        // define a speck
+        const speckGeometry = new THREE.SphereGeometry(1, 32, 16);
+        const speckMaterial = new THREE.MeshPhongMaterial({
+            color: 0xfffce5,
+            specular: 0x111111,
+            shininess: 30,
+            emissive: 0x232f34,
+            reflectivity: 0.262,
+            refractionRatio: 0.249,
+            fog: false
+        }); 
+
+        // build field of specks
+        for (let i = 0; i < 15000; i++) {
+            const speckMesh = new THREE.Mesh(speckGeometry, speckMaterial);
+
+            speckMesh.position.x = 2000 * (2.0 * Math.random() - 1.0);
+            speckMesh.position.y = 2000 * (2.0 * Math.random() - 1.0);
+            speckMesh.position.z = 2000 * (2.0 * Math.random() - 1.0);
+
+            // speckMesh.rotation.x = Math.random() * Math.PI;
+            // speckMesh.rotation.y = Math.random() * Math.PI;
+            // speckMesh.rotation.z = Math.random() * Math.PI;
+
+            speckMesh.matrixAutoUpdate = false;
+            speckMesh.updateMatrix();
+
+            scene.add(speckMesh);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
