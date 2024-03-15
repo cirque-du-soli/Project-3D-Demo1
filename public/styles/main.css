@@ -43,9 +43,27 @@ button {
 
 #controls {
     position: fixed;
-    top: 30px;
-    left: 30px;
-    width: 30vw;
+    top: 20px;
+    left: 20px;
+    width: 20vw;
+    height: 20vh;
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: left;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    z-index: 3;
+    color: aqua;
+}
+#score {
+    position: fixed;
+    bottom: 0px;
+    left: 20px;
+    width: 20vw;
+    height: 20vh;
     padding: 10px;
     box-sizing: border-box;
     text-align: left;

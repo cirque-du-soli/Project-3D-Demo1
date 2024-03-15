@@ -26,21 +26,38 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     ////////// Global Variables
     // DOM
     let container, stats;
+
     // Stage
-    let scene, camera, renderer;
+    let scene, camera, renderer, renderedGroup, intersectedGroup;
+
     // Loaders
     let miscLoader, bgLoader;
+
     // Controls
     let flyControls, orbitControls;
+
     // Geometries
     let cube, line;
+
     // Animation
     let clock;
+
     // Lighting
     let ambientLight, spotLight, lensflareLight1, lensflareLight2;
     const textureLoader = new THREE.TextureLoader();
     const textureFlare0 = textureLoader.load('textures/lensflare0.png');
     const textureFlare3 = textureLoader.load('textures/lensflare3.png');
+    
+    // Raycasting
+    let raycaster = new THREE.Raycaster();
+    let INTERSECTED;
+    let intersects;
+
+    // Game Logic
+    let scoreCurrent = 0;
+    let scoreTarget = 11;
+    
+    const pointer = new THREE.Vector2();
 
     initialSetup();
 
@@ -52,8 +69,9 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
 
     const planets = buildPlanets();
 
-    renderRandomPlanet(planets);
-
+    //renderRandomPlanet(planets);
+    renderAllPlanets(planets);
+ 
     animate();
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,9 +81,15 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         // DOM Container
         container = document.createElement('div');
         document.body.appendChild(container);
+        document.getElementById('scoreCurrent').text = scoreCurrent;
+        document.getElementById('scoreTarget').text = scoreTarget;
 
         // Create a scene
         scene = new THREE.Scene();
+        intersectedGroup = new THREE.Group();
+        renderedGroup = new THREE.Group();
+        scene.add(renderedGroup);
+        scene.add(intersectedGroup);
 
         // Add camera, set its position and orientation
         camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 5000);
@@ -97,6 +121,8 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         window.addEventListener('resize', onWindowResize);
         document.body.addEventListener('mouseleave', onMouseLeave);
         document.body.addEventListener('mouseenter', onMouseEnter);
+        document.addEventListener('pointermove', onPointerMove);
+        document.body.addEventListener('click', onClick);
     }
 
 
@@ -188,7 +214,7 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
             scene.environment = texture;
         });
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1; // adjust this!! FIXME
+        renderer.toneMappingExposure = 1; 
         renderer.outputEncoding = THREE.sRGBEncoding;
     }
 
@@ -283,7 +309,23 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         planet.position.set(x, y, z);
 
         // Add to scene
-        scene.add(planet);
+        renderedGroup.add(planet);
+
+    }
+    function renderAllPlanets(planetMeshes) {
+
+        let x, y, z;
+        for (let i = 0; i < planetMeshes.length; i++) {
+            // Generate random numbers between +500 and -500
+            x = Math.floor(Math.random() * 3001) - 1500;
+            y = Math.floor(Math.random() * 3001) - 1500;
+            z = Math.floor(Math.random() * 3001) - 1500;
+
+            let planet = planetMeshes[i];
+            planet.position.set(x, y, z);
+            renderedGroup.add(planet);
+
+        }
 
     }
 
@@ -387,7 +429,33 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         const delta = clock.getDelta();
         //orbitControls.update(delta);
         flyControls.update(delta);
+
+        raycasterUpdate();
+
         renderer.render(scene, camera);
+    }
+    
+    function raycasterUpdate() {
+        pointer.x = (pointer.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = - (pointer.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        intersects = raycaster.intersectObjects(renderedGroup.children, true);
+
+        if (intersects.length > 0) {
+
+            for (let i = 0; i < intersects.length; i++) {
+                console.log('boop!');
+                intersectedGroup.add(intersects[i].object);
+            }
+
+            intersects.length = 0; // clear array
+        } else {
+            // clear intersectedGroup
+            for (let i = 0; i < intersectedGroup.children.length; i++) {
+                renderedGroup.add(intersectedGroup.children[i]);
+            }
+        }
+
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -407,6 +475,39 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     function onMouseEnter() {
         flyControls.freeze = false;
         //console.log('unfreeze');
+    }
+
+    function onPointerMove(event) {
+        pointer.clientX = event.clientX;
+        pointer.clientY = event.clientY;
+        pointer.x = (pointer.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = - (pointer.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    function onClick(event) {
+
+        pointer.clientX = event.clientX;
+        pointer.clientY = event.clientY;
+        pointer.x = (pointer.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = - (pointer.clientY / window.innerHeight) * 2 + 1;
+        console.log("... oh?");
+
+        if (intersectedGroup.children.length > 0) {
+            console.log('clicked intersectedGroup');
+            for (let i = 0; i < intersectedGroup.children.length; i++) {
+                if (intersectedGroup.children[i].material.color.getHex() != 0x00ff00) {
+                    intersectedGroup.children[i].material.color.set(0x00ff00);
+                    renderedGroup.add(intersectedGroup.children[i]);
+                    scoreCurrent++;
+                    document.getElementById('scoreCurrent').innerText = scoreCurrent;
+                }
+            }
+
+            if (scoreCurrent >= scoreTarget) {
+                alert('You win!');
+            }
+
+        }
     }
 
 } //END: WebGL Check
