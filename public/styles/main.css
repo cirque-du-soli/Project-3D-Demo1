@@ -41,20 +41,21 @@ button {
     text-transform: uppercase;
 }
 
-#info2 {
-    position: absolute;
-    top: 0px;
-    width: 100%;
+#controls {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    width: 30vw;
     padding: 10px;
     box-sizing: border-box;
-    text-align: center;
+    text-align: left;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
     pointer-events: none;
-    z-index: 1;
-    /* TODO Solve this in HTML */
+    z-index: 3;
+    color: aqua;
 }
 
 a,

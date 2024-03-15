@@ -28,8 +28,6 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     let container, stats;
     // Stage
     let scene, camera, renderer;
-    // Lighting
-    let ambientLight, spotLight, lensflareLight1, lensflareLight2;
     // Loaders
     let miscLoader, bgLoader;
     // Controls
@@ -38,6 +36,11 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     let cube, line;
     // Animation
     let clock;
+    // Lighting
+    let ambientLight, spotLight, lensflareLight1, lensflareLight2;
+    const textureLoader = new THREE.TextureLoader();
+    const textureFlare0 = textureLoader.load('textures/lensflare0.png');
+    const textureFlare3 = textureLoader.load('textures/lensflare3.png');
 
     initialSetup();
 
@@ -59,7 +62,7 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         scene = new THREE.Scene();
 
         // Add camera, set its position and orientation
-        camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 500);
+        camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 5000);
         camera.position.set(55, 0, -35);
         camera.lookAt(0, 0, 0);
 
@@ -91,6 +94,43 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     }
 
 
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // Lighting Functions 
+    function genRandFlares() {
+        let min1 = 0.03;
+        let max1 = 0.07;
+        let min2 = 0.15;
+        let max2 = 0.25;
+        let min3 = 0.09;
+        let max3 = 0.11;
+        let min4 = 0.32;
+        let max4 = 0.38;
+        return [
+            (Math.random() * (max1 - min1) + min1),
+            (Math.random() * (max2 - min2) + min2),
+            (Math.random() * (max3 - min3) + min3),
+            (Math.random() * (max4 - min4) + min4)
+        ]
+    }
+
+    function addLight(h, s, l, x, y, z) {
+
+        const light = new THREE.PointLight(0xffffff, 1.5, 4000, 0);
+        light.color.setHSL(h, s, l);
+        light.position.set(x, y, z);
+        scene.add(light);
+
+        let randomFlares = genRandFlares();
+
+        const lensflare = new Lensflare();
+        lensflare.addElement(new LensflareElement(textureFlare0, 200, 0, light.color));
+        lensflare.addElement(new LensflareElement(textureFlare3, 60, randomFlares[0]));
+        lensflare.addElement(new LensflareElement(textureFlare3, 70, randomFlares[1]));
+        lensflare.addElement(new LensflareElement(textureFlare3, 100, randomFlares[2]));
+        lensflare.addElement(new LensflareElement(textureFlare3, 50, randomFlares[3]));
+        light.add(lensflare);
+
+    }
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Control Functions 
 
@@ -128,6 +168,37 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
 
     }
 
+    function tetrahedronCoords() {
+
+        let m = 2000; // scale multiplier
+
+        let x1 = m * 1;
+        let y1 = m * -1 / Math.sqrt(3);
+        let z1 = m * -1 / Math.sqrt(6);
+        let x2 = m * -1;
+        let y2 = m * -1 / Math.sqrt(3);
+        let z2 = m * -1 / Math.sqrt(6);
+        let x3 = m * 0;
+        let y3 = m * 2 / Math.sqrt(3);
+        let z3 = m * -1 / Math.sqrt(6);
+        let x4 = m * 0;
+        let y4 = m * 0;
+        let z4 = m * 3 / Math.sqrt(6);
+
+        return [x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4];
+    }
+
+    function randCoord(min, max) {
+        // random number gen
+        let r1 = Math.random() * (max - min) + min;
+        let r2 = Math.random() * (max - min) + min;
+        let r3 = Math.random() * (max - min) + min;
+        let r4 = Math.random() * (max - min) + min;
+        let r5 = Math.random() * (max - min) + min;
+        let r6 = Math.random() * (max - min) + min;
+        return [r4, r4, r3, r2, r1, r2, r3, r5, r2, r1, r1, r6, r3, r1, r2];
+    }
+
     function buildGeometries() {
         // Create a cube
         cube = buildCube();
@@ -136,6 +207,18 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         // Create a lines
         line = buildLine();
         scene.add(line);
+
+
+        let max = 2000;
+        let min = -2000;
+        //let coords = randCoord(min, max);
+        let coords = tetrahedronCoords();
+        // lensflares
+        addLight((308 / 360), 1, .65, coords[0], coords[1], coords[2]);
+        addLight((52 / 360), 1, .59, coords[3], coords[4], coords[5]);
+        addLight((237 / 360), 1, .86, coords[6], coords[7], coords[8]);
+        addLight((34 / 360), 1, .74, coords[9], coords[10], coords[11]);
+        addLight((200 / 360), 1, .54, Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min);
     }
 
     function buildLine() {
@@ -194,7 +277,7 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         flyControls.freeze = true;
         //console.log('freeze');
     }
-    
+
     function onMouseEnter() {
         flyControls.freeze = false;
         //console.log('unfreeze');

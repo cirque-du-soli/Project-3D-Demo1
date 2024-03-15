@@ -75,7 +75,7 @@ class FlyControls extends EventDispatcher {
                 case 'ShiftLeft':
                 case 'ShiftRight': this.movementSpeedMultiplier = .1; break;
 
-                case 'KeyW': this.moveState.forward = 1; console.log('wwwwwwwwwww!!!!!!!!!!!!!!!!'); break;
+                case 'KeyW': this.moveState.forward = 1; break;
                 case 'KeyS': this.moveState.back = 1; break;
 
                 case 'KeyA': this.moveState.left = 1; break;
