@@ -50,6 +50,10 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
 
     buildBackground();
 
+    const planets = buildPlanets();
+
+    renderRandomPlanet(planets);
+
     animate();
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -156,9 +160,9 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
     // Control Functions 
 
     function customizeFlyControls() {
-        flyControls.movementSpeed = 50;
+        flyControls.movementSpeed = 77;
         flyControls.domElement = container;
-        flyControls.rollSpeed = Math.PI / 6;
+        flyControls.rollSpeed = Math.PI / 5;
         flyControls.autoForward = false;
         flyControls.dragToLook = false;
         flyControls.enableDamping = true;
@@ -172,7 +176,6 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         orbitControls.enableZoom = false;
         orbitControls.enabled = false;
     }
-
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Geometry Functions
@@ -268,6 +271,104 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         }
     }
 
+    function renderRandomPlanet(planetMeshes) {
+
+        // Generate random numbers between +500 and -500
+        const x = Math.floor(Math.random() * 1001) - 500;
+        const y = Math.floor(Math.random() * 1001) - 500;
+        const z = Math.floor(Math.random() * 1001) - 500;
+
+        // Modify item at random index
+        let planet = planetMeshes[Math.floor(Math.random() * planetMeshes.length)];
+        planet.position.set(x, y, z);
+
+        // Add to scene
+        scene.add(planet);
+
+    }
+
+    function buildPlanets() {
+
+        // Planet Textures
+        const sunTexture = new THREE.TextureLoader().load('../textures/2k_sun.jpg');
+        const mercuryTexture = new THREE.TextureLoader().load('../textures/2k_mercury.jpg');
+        const venusAtmoTexture = new THREE.TextureLoader().load('../textures/2k_venus_atmosphere.jpg');
+        const venusSurfTexture = new THREE.TextureLoader().load('../textures/2k_venus_surface.jpg');
+
+        const earthTexture = new THREE.TextureLoader().load('../textures/2k_earth_daymap.jpg');
+        const moonTexture = new THREE.TextureLoader().load('../textures/2k_moon.jpg');
+        const marsTexture = new THREE.TextureLoader().load('../textures/2k_mars.jpg');
+
+        const jupiterTexture = new THREE.TextureLoader().load('../textures/2k_jupiter.jpg');
+        const saturnTexture = new THREE.TextureLoader().load('../textures/2k_saturn.jpg');
+        const uranusTexture = new THREE.TextureLoader().load('../textures/2k_uranus.jpg');
+        const dunaTexture = new THREE.TextureLoader().load('../textures/duna.png');
+
+        // Planets aka hawt rocks
+        let planetMeshes = [];
+        let sizeMultiplier = 5;
+        const moonMesh = buildPlanetMesh(3 * sizeMultiplier, moonTexture); 
+        const mercuryMesh = buildPlanetMesh(5 * sizeMultiplier, mercuryTexture);
+        const venusSurfMesh = buildPlanetMesh(7 * sizeMultiplier, venusSurfTexture);
+        const venusAtmoMesh = buildPlanetMesh(9 * sizeMultiplier, venusAtmoTexture);
+        const marsMesh = buildPlanetMesh(12 * sizeMultiplier, marsTexture);
+        const earthMesh = buildPlanetMesh(14 * sizeMultiplier, earthTexture);
+        const uranusMesh = buildPlanetMesh(18 * sizeMultiplier, uranusTexture);
+        const saturnMesh = buildPlanetMesh(26 * sizeMultiplier, saturnTexture);
+        const jupiterMesh = buildPlanetMesh(35 * sizeMultiplier, jupiterTexture);
+        const sunMesh = buildPlanetMesh(55 * sizeMultiplier, sunTexture);
+
+        const dunaMesh = buildPlanetMesh(16, dunaTexture);
+
+        // Add planets to array
+        planetMeshes.push(moonMesh);
+        planetMeshes.push(mercuryMesh);
+        planetMeshes.push(venusSurfMesh);
+        planetMeshes.push(venusAtmoMesh);
+        planetMeshes.push(marsMesh);
+        planetMeshes.push(earthMesh);
+        planetMeshes.push(uranusMesh);
+        planetMeshes.push(saturnMesh);
+        planetMeshes.push(jupiterMesh);
+        planetMeshes.push(sunMesh);
+        planetMeshes.push(dunaMesh);
+
+        // Add planets to scene
+        /*
+        scene.add(sun);
+        scene.add(mercury);
+        scene.add(venusSurf);
+        scene.add(venusAtmo);
+
+        scene.add(earth);
+        scene.add(moon);
+        scene.add(mars);
+
+        scene.add(jupiter);
+        scene.add(saturn);
+        scene.add(uranus);
+        scene.add(duna);
+        */
+        return planetMeshes;
+    }
+
+    function buildPlanetMesh(size, texture) {
+        const planetGeometry = new THREE.SphereGeometry(size, 48, 32);
+        const planetMaterial = new THREE.MeshBasicMaterial({ map: texture });
+        const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+        return planetMesh;
+    }
+
+    function transformPlanets() {
+
+        // Rotate planets
+        for (let i = 0; i < planets.length; i++) {
+            planets[i].rotation.y += (Math.random() * (0.007 - 0.001) + 0.001); 
+        }
+    }
+
+
+
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Painting Functions
 
@@ -275,6 +376,8 @@ if (!WebGL.isWebGLAvailable()) { // WebGL is not available
         requestAnimationFrame(animate);
 
         transformCube(); // all entity transformations belong here
+        transformPlanets();
+
         render();
         stats.update();
 
