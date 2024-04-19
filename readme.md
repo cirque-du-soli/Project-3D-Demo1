@@ -1,9 +1,10 @@
-Welcome!
+# Welcome to Asteroid 3D
 
-The goal of this project is to learn a new technology, three.js, and create an interactive 3D web page. 
+## Introduction
+Asteroid 3D is a browser-based game built with Three.js and Node. 
+The goal of this project was to experiment with 3D interactivity while learning Three.js.
 
-Also notable will be the use of blender to make (or edit, if pre-existing/open-source) a 3D model and environment.
+## Additional Info
+During the creation of this project, I was able to add features on top of the Three.js library (pending approval) including a movement-inertia implementation that allows for smoother navigation through 3D space.
 
-Wish me luck!
 
-SY
